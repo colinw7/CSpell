@@ -8,10 +8,11 @@
 /* Private Routines */
 
 extern void         CSpellInitTree    (char *);
+extern void         CSpellTermTree    ();
 extern CDSpellDEnt *CSpellInsertInTree(const char *, int);
 extern CDSpellDEnt *CSpellTreeLookup  (char *);
 #ifdef NEVER
-extern void         CScriptTreeOutput (void);
+extern void         CScriptTreeOutput ();
 #endif
 
 /*****************************************************************************/

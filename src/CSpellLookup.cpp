@@ -14,8 +14,7 @@ static int inited = 0;
  * #NAME CSpellInitWords
  *
  * #FUNCTION
- *       Initialise List of Words in the Dictionary by
- *       reading them in from the Hash File.
+ *       Initialise List of Words in the Dictionary by reading them in from the Hash File.
  *
  * #CALL_DETAILS
  *       flag = CSpellInitWords();
@@ -36,7 +35,7 @@ static int inited = 0;
  *
  *------------------------------------------------------------------*/
 
-extern int
+int
 CSpellInitWords()
 {
   int          i;
@@ -56,13 +55,10 @@ CSpellInitWords()
 
   if (cspell_hashsize == 0) {
     /*
-     * Empty file - create an empty dummy table.  We
-     * actually have to have one entry since the hash
-     * algorithm involves a divide by the table size
-     * (actually modulo, but zero is still unacceptable).
-     * So we create an entry with a word of all lowercase,
-     * which can't match because the comparison str has
-     * been converted to uppercase by then.
+     * Empty file - create an empty dummy table.  We actually have to have one entry
+     * since the hash algorithm involves a divide by the table size (actually modulo,
+     * but zero is still unacceptable). So we create an entry with a word of all lowercase,
+     * which can't match because the comparison str has been converted to uppercase by then.
      */
 
     close(hashfd);
@@ -157,6 +153,12 @@ CSpellInitWords()
   return 0;
 }
 
+void
+CSpellTermWords()
+{
+  inited = false;
+}
+
 /*------------------------------------------------------------------*
  *
  * #NAME CSpellLookupWord
@@ -190,7 +192,7 @@ CSpellInitWords()
  *
  *------------------------------------------------------------------*/
 
-extern CDSpellDEnt *
+CDSpellDEnt *
 CSpellLookupWord(char *s, int n, int dotree)
 {
   CDSpellDEnt *dp = &cspell_hashtbl[CSpellHash(s, n, cspell_hashsize)];

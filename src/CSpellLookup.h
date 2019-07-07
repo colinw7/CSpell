@@ -12,8 +12,9 @@ extern int           hashsize;
 
 /* Private Routines */
 
-extern int           CSpellInitWords  (void);
-extern CDSpellDEnt  *CSpellLookupWord (char *, int, int);
+extern int           CSpellInitWords ();
+extern void          CSpellTermWords ();
+extern CDSpellDEnt  *CSpellLookupWord(char *, int, int);
 
 /*****************************************************************************/
 

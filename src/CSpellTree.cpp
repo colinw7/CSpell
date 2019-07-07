@@ -58,13 +58,13 @@
 
 /* Internal Data */
 
-static int          cantexpand = 0;    /* NZ if an expansion fails */
-static CDSpellDEnt *htab       = NULL; /* Hash table for our stuff */
-static int          hsize      = 0;    /* Space available in hash table */
-static int          hcount     = 0;    /* Number of items in hash table */
+static int          cantexpand = 0;       /* NZ if an expansion fails */
+static CDSpellDEnt *htab       = nullptr; /* Hash table for our stuff */
+static int          hsize      = 0;       /* Space available in hash table */
+static int          hcount     = 0;       /* Number of items in hash table */
 
 static char         personaldict[MAXPATHLEN] = "";
-static FILE        *dictf                    = NULL;
+static FILE        *dictf                    = nullptr;
 static int          newwords                 = 0;
 
 #if 0
@@ -138,15 +138,15 @@ static void         CSpellOutputFlag
  * #NAME CSpellInitTree
  *
  * #FUNCTION
- *       Initialise List of Words in the User's Personal
- *       Dictionary by reading them in from a File.
+ *       Initialise List of Words in the User's Personal Dictionary by
+ *       reading them in from a File.
  *
  * #CALL_DETAILS
- *       CSpellInitTree(p);
+ *       CSpellInitTree(char *p);
  *
  * #INPUT_ARGS
- *       p       : Name of File to Read (NULL implies
- *        char * : look in default places).
+ *       p       : Name of File to Read (NULL implies look in default places).
+ *        char * :
  *
  * #OUTPUT_ARGS
  *       None
@@ -159,7 +159,7 @@ static void         CSpellOutputFlag
  *
  *------------------------------------------------------------------*/
 
-extern void
+void
 CSpellInitTree(char *p)
 {
   char        *h;
@@ -174,13 +174,13 @@ CSpellInitTree(char *p)
 
   orig = p;
 
-  if (p == NULL)
+  if (! p)
     p = getenv(PDICTVAR);
 
-  if ((h = getenv("HOME")) == NULL)
+  if ((h = getenv("HOME")) == nullptr)
     h = (char *) ".";
 
-  if (p == NULL)
+  if (! p)
     sprintf(personaldict, "%s/%s", h, DEFPDICT);
   else {
     if (*p == '/')
@@ -194,21 +194,21 @@ CSpellInitTree(char *p)
       ** PDICTVAR:   $HOME/name first, then as-is
       **/
 
-      if (orig == NULL)
+      if (! orig)
         sprintf(personaldict, "%s/%s", h, p);
       else /* -p switch */
         strcpy(personaldict, p);
     }
   }
 
-  if ((dictf = fopen(personaldict, "r")) == NULL) {
+  if ((dictf = fopen(personaldict, "r")) == nullptr) {
     /* The file doesn't exist. */
 
-    if (p != NULL) {
+    if (p) {
       /* If pathname is relative, try another place */
 
       if (*p != '/') {
-        if (orig == NULL)
+        if (! orig)
           strcpy (personaldict, p);
         else /* -p switch */
           sprintf(personaldict, "%s/%s", h, p);
@@ -216,7 +216,7 @@ CSpellInitTree(char *p)
         dictf = fopen (personaldict, "r");
       }
 
-      if (dictf == NULL) {
+      if (! dictf) {
         fprintf(stderr, "Couldn't open ");
         perror(p);
 
@@ -227,7 +227,7 @@ CSpellInitTree(char *p)
           ** place.
           */
 
-          if (orig == NULL)
+          if (! orig)
             sprintf(personaldict, "%s/%s", h, p);
           else /* -p switch */
             strcpy(personaldict, p);
@@ -240,18 +240,18 @@ CSpellInitTree(char *p)
     return;
   }
 
-  while (fgets(buf, sizeof buf, dictf) != NULL) {
+  while (fgets(buf, sizeof buf, dictf) != nullptr) {
     int len = strlen(buf) - 1;
 
     if (buf[len] == '\n')
       buf[len] = '\0';
 
-    if ((h = strchr(buf, '/')) != NULL)
+    if ((h = strchr(buf, '/')) != nullptr)
       *h++ = '\0';
 
     dp = CSpellInsertInTree(buf, 1);
 
-    if (h != NULL) {
+    if (h) {
       while (*h != '\0' && *h != '\n') {
         if (islower (*h))
           *h = toupper (*h);
@@ -326,6 +326,23 @@ CSpellInitTree(char *p)
             personaldict);
 }
 
+void
+CSpellTermTree()
+{
+  cantexpand = 0;
+  htab       = nullptr;
+  hsize      = 0;
+  hcount     = 0;
+
+  personaldict[0] = '\0';
+  dictf           = nullptr;
+  newwords        = 0;
+
+#if 0
+  hasslash = false;
+#endif
+}
+
 /*------------------------------------------------------------------*
  *
  * #NAME CSpellInsertInTree
@@ -354,7 +371,7 @@ CSpellInitTree(char *p)
  *
  *------------------------------------------------------------------*/
 
-extern CDSpellDEnt *
+CDSpellDEnt *
 CSpellInsertInTree(const char *word, int keep)
 {
   int           i;
@@ -794,7 +811,7 @@ CSpellTreeInsert(char *word, CDSpellDEnt *proto, int keep)
  *
  *------------------------------------------------------------------*/
 
-extern CDSpellDEnt *
+CDSpellDEnt *
 CSpellTreeLookup(char *word)
 {
   CDSpellDEnt *hp;
@@ -918,8 +935,8 @@ CSpellToLower(char *s)
  *---------------------------------------------------------------------*/
 
 #ifdef NEVER
-extern void
-CScriptTreeOutput(void)
+void
+CScriptTreeOutput()
 {
   CDSpellDEnt   *cent;      /* Current entry */
   CDSpellDEnt   *lent;      /* Linked entry */

@@ -26,8 +26,7 @@ static char *personal_dictionary_filename = NULL;
  * #NAME CSpellInit
  *
  * #FUNCTION
- *       Initialise the Spell Checker by Reading the
- *       Words from the Dictionary File.
+ *       Initialise the Spell Checker by Reading the Words from the Dictionary File.
  *
  * #CALL_DETAILS
  *       flag = CSpellInit();
@@ -69,11 +68,22 @@ CSpellInit()
 extern void
 CSpellTerm()
 {
+  CSpellTermTree();
+
+  CSpellTermWords();
+
   delete [] cspell_hash_strings;
   delete [] cspell_hashtbl;
 
+  cspell_aflag        = 0;
+  cspell_lflag        = 0;
+  cspell_rootword[0]  = '\0';
+  cspell_last_dent    = nullptr;
   cspell_hash_strings = nullptr;
+  cspell_hashheader   = CDSpellHashHeader();
+  cspell_hash_file[0] = '\0';
   cspell_hashtbl      = nullptr;
+  cspell_hashsize     = 0;
 }
 
 /*------------------------------------------------------------------*
