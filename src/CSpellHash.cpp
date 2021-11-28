@@ -33,7 +33,7 @@
  *------------------------------------------------------------------*/
 
 extern unsigned int
-CSpellHash(char *str, int length, int hashsize)
+CSpellHash(char *str, int length, int hash_size)
 {
   short hash = 0;
 
@@ -51,8 +51,8 @@ CSpellHash(char *str, int length, int hashsize)
 
   hash &= 077777;
 
-  if (hashsize == 0)
+  if (hash_size == 0)
     return 0;
 
-  return ((unsigned int) hash % hashsize);
+  return ((unsigned int) hash % hash_size);
 }

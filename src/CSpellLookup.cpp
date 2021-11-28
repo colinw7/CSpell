@@ -94,9 +94,9 @@ CSpellInitWords()
 
   cspell_hashtbl = new CDSpellDEnt [cspell_hashheader.tblsize];
 
-  CDSpellHEnt *hashtbl = new CDSpellHEnt [cspell_hashheader.tblsize];
+  CDSpellHEnt *hashtbl1 = new CDSpellHEnt [cspell_hashheader.tblsize];
 
-  if (! cspell_hashtbl || ! cspell_hash_strings || ! hashtbl) {
+  if (! cspell_hashtbl || ! cspell_hash_strings || ! hashtbl1) {
     fprintf(stderr, "Couldn't allocate space for hash table\n");
     return(-1);
   }
@@ -104,11 +104,11 @@ CSpellInitWords()
   cspell_hashsize = cspell_hashheader.tblsize;
 
   read(hashfd, cspell_hash_strings, cspell_hashheader.stringsize);
-  read(hashfd, hashtbl            , cspell_hashheader.tblsize*sizeof(CDSpellDEnt));
+  read(hashfd, hashtbl1           , cspell_hashheader.tblsize*sizeof(CDSpellDEnt));
 
   close(hashfd);
 
-  for (i = cspell_hashsize, hp = hashtbl, dp = cspell_hashtbl; --i >= 0; ++hp, ++dp) {
+  for (i = cspell_hashsize, hp = hashtbl1, dp = cspell_hashtbl; --i >= 0; ++hp, ++dp) {
     assert(hp->word >= 0 && hp->word < cspell_hashheader.stringsize);
 
     dp->word = &cspell_hash_strings[hp->word];
@@ -146,7 +146,7 @@ CSpellInitWords()
 #endif
   }
 
-  delete [] hashtbl;
+  delete [] hashtbl1;
 
   inited = true;
 
