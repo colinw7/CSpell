@@ -54,5 +54,5 @@ CSpellHash(char *str, int length, int hash_size)
   if (hash_size == 0)
     return 0;
 
-  return ((unsigned int) hash % hash_size);
+  return uint(hash % hash_size);
 }

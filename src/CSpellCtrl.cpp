@@ -19,7 +19,7 @@ int                cspell_hashsize              = 0;
 
 /*--------------------------------------------------------------------*/
 
-static char *personal_dictionary_filename = NULL;
+static char *personal_dictionary_filename = nullptr;
 
 /*------------------------------------------------------------------*
  *
@@ -50,7 +50,7 @@ static char *personal_dictionary_filename = NULL;
 extern bool
 CSpellInit()
 {
-  if (getenv("CSPELL_DIR") != NULL)
+  if (getenv("CSPELL_DIR") != nullptr)
     sprintf(cspell_hash_file, "%s/%s", getenv("CSPELL_DIR"), DEFHASH);
   else
     sprintf(cspell_hash_file, "%s", DEFHASH);
@@ -126,7 +126,7 @@ CSpellCheckString(const char *str)
 
   CStrUtil::addWords(str, words);
 
-  uint num_words = words.size();
+  uint num_words = uint(words.size());
 
   for (uint i = 0; i < num_words; i++) {
     int check = CSpellCheckWord(words[i]);
@@ -173,7 +173,7 @@ CSpellCheckString(const char *str)
 extern int
 CSpellCheckWord(const std::string &word)
 {
-  return CSpellCheckWord(word.c_str(), word.size(), NULL);
+  return CSpellCheckWord(word.c_str(), int(word.size()), nullptr);
 }
 
 extern int
@@ -186,14 +186,14 @@ CSpellCheckWord(const char *word, uint length, char **word1)
 
   /* Remove Leading ' " ( [ { < Characters */
 
-  while (n > 0 && strchr("\'\"([{<", p[0]) != NULL) {
+  while (n > 0 && strchr("\'\"([{<", p[0]) != nullptr) {
     p++;
     n--;
   }
 
   /* Remove Trailing ' " ) ] } > . , ; : ! ? Characters */
 
-  while (n > 0 && strchr("\'\")]}>.,;:!?", p[n - 1]) != NULL)
+  while (n > 0 && strchr("\'\")]}>.,;:!?", p[n - 1]) != nullptr)
     p[--n] = '\0';
 
   /* Ignore Word starting or ending with non-alphabetic */
@@ -247,7 +247,7 @@ CSpellCheckWord(const char *word, uint length, char **word1)
 
   delete [] p1;
 
-  if (word1 != NULL)
+  if (word1 != nullptr)
     *word1 = p;
   else
     delete [] word2;

@@ -178,7 +178,7 @@ CSpellInitTree(char *p)
     p = getenv(PDICTVAR);
 
   if ((h = getenv("HOME")) == nullptr)
-    h = (char *) ".";
+    h = const_cast<char *>(".");
 
   if (! p)
     sprintf(personaldict, "%s/%s", h, DEFPDICT);
@@ -241,7 +241,7 @@ CSpellInitTree(char *p)
   }
 
   while (fgets(buf, sizeof buf, dictf) != nullptr) {
-    int len = strlen(buf) - 1;
+    int len = int(strlen(buf) - 1);
 
     if (buf[len] == '\n')
       buf[len] = '\0';
@@ -254,51 +254,23 @@ CSpellInitTree(char *p)
     if (h) {
       while (*h != '\0' && *h != '\n') {
         if (islower (*h))
-          *h = toupper (*h);
+          *h = char(toupper(*h));
 
         switch (*h++) {
-          case 'D':
-            dp->d_flag = true;
-            break;
-          case 'G':
-            dp->g_flag = true;
-            break;
-          case 'H':
-            dp->h_flag = true;
-            break;
-          case 'J':
-            dp->j_flag = true;
-            break;
-          case 'M':
-            dp->m_flag = true;
-            break;
-          case 'N':
-            dp->n_flag = true;
-            break;
-          case 'P':
-            dp->p_flag = true;
-            break;
-          case 'R':
-            dp->r_flag = true;
-            break;
-          case 'S':
-            dp->s_flag = true;
-            break;
-          case 'T':
-            dp->t_flag = true;
-            break;
-          case 'V':
-            dp->v_flag = true;
-            break;
-          case 'X':
-            dp->x_flag = true;
-            break;
-          case 'Y':
-            dp->y_flag = true;
-            break;
-          case 'Z':
-            dp->z_flag = true;
-            break;
+          case 'D': dp->d_flag = true; break;
+          case 'G': dp->g_flag = true; break;
+          case 'H': dp->h_flag = true; break;
+          case 'J': dp->j_flag = true; break;
+          case 'M': dp->m_flag = true; break;
+          case 'N': dp->n_flag = true; break;
+          case 'P': dp->p_flag = true; break;
+          case 'R': dp->r_flag = true; break;
+          case 'S': dp->s_flag = true; break;
+          case 'T': dp->t_flag = true; break;
+          case 'V': dp->v_flag = true; break;
+          case 'X': dp->x_flag = true; break;
+          case 'Y': dp->y_flag = true; break;
+          case 'Z': dp->z_flag = true; break;
           default:
             fprintf(stderr, "Illegal flag in personal dictionary");
             fprintf(stderr, " - %c (word %s)\n",
@@ -382,7 +354,6 @@ CSpellInsertInTree(const char *word, int keep)
   int           oldhsize;
   char          nword[BUFSIZ];
 #ifdef CSPELL_CAPS
-  int           capspace;
   char         *saveword;
 #endif
 
@@ -390,10 +361,10 @@ CSpellInsertInTree(const char *word, int keep)
 
   CSpellToUpper(nword);
 
-  len = strlen(nword);
+  len = int(strlen(nword));
 
   if ((dp = CSpellLookupWord(nword, len, 0)) != NULL)
-    dp->keep = keep;
+    dp->keep = bool(keep);
 
   /*
    * Expand hash table when it is MAXPCT % full.
@@ -412,7 +383,7 @@ CSpellInsertInTree(const char *word, int keep)
     else
       hsize = goodsizes[i];
 
-    htab = (CDSpellDEnt *) calloc(hsize, sizeof(CDSpellDEnt));
+    htab = reinterpret_cast<CDSpellDEnt *>(calloc(hsize, sizeof(CDSpellDEnt)));
 
     if (htab == NULL) {
       fprintf(stderr, "Ran out of space for personal dictionary\n");
@@ -435,7 +406,7 @@ CSpellInsertInTree(const char *word, int keep)
       htab       = oldhtab;  /* ... */
       newwords   = 1;        /* And pretend it worked */
 
-      return(CSpellTreeInsert(nword, (CDSpellDEnt *) NULL, keep));
+      return(CSpellTreeInsert(nword, nullptr, keep));
     }
     else {
       /*
@@ -456,13 +427,13 @@ CSpellInsertInTree(const char *word, int keep)
             olddp = dp;
             dp    = dp->next;
 
-            free((char *) olddp);
+            free(reinterpret_cast<void *>(olddp));
           }
         }
       }
 
       if (oldhtab != NULL)
-        free((char *) oldhtab);
+        free(reinterpret_cast<void *>(oldhtab));
 
       dp = NULL;    /* This will force the insert below */
     }
@@ -471,7 +442,7 @@ CSpellInsertInTree(const char *word, int keep)
   newwords |= keep;
 
   if (dp == NULL)
-    dp = CSpellTreeInsert(nword, (CDSpellDEnt *) NULL, keep);
+    dp = CSpellTreeInsert(nword, nullptr, keep);
 
 #ifdef CSPELL_CAPS
   if (dp == NULL)
@@ -553,19 +524,19 @@ CSpellInsertInTree(const char *word, int keep)
           if (keep)
             dp->k_followcase = 1;
 
-          capspace = 2 * len + 4;
+          int capspace = 2 * len + 4;
 
           if (dp->word >= cspell_hash_strings &&
               dp->word <= cspell_hash_strings +
                           cspell_hashheader.stringsize) {
             cp       = dp->word;
-            dp->word = (char *) malloc(capspace);
+            dp->word = reinterpret_cast<char *>(malloc(capspace));
 
             if (dp->word)
               strcpy(dp->word, cp);
           }
           else
-            dp->word = (char *) realloc(dp->word, capspace);
+            dp->word = reinterpret_cast<char *>(realloc(dp->word, capspace));
 
           if (dp->word == NULL) {
             fprintf(stderr,
@@ -613,13 +584,13 @@ CSpellInsertInTree(const char *word, int keep)
 
           (*cp)++;
 
-          capspace = (cp - dp->word + 1)*((*cp & 0xFF) + 1);
+          int capspace = int((cp - dp->word + 1)*((*cp & 0xFF) + 1));
 
           if (dp->word >= cspell_hash_strings &&
               dp->word <= cspell_hash_strings +
                           cspell_hashheader.stringsize) {
             saveword = dp->word;
-            dp->word = (char *) malloc(capspace);
+            dp->word = reinterpret_cast<char *>(malloc(capspace));
 
             if (dp->word) {
               cp = dp->word;
@@ -629,7 +600,7 @@ CSpellInsertInTree(const char *word, int keep)
             }
           }
           else
-            dp->word = (char *) realloc(dp->word, capspace);
+            dp->word = reinterpret_cast<char *>(realloc(dp->word, capspace));
 
           if (dp->word == NULL) {
             fprintf(stderr, "Ran out of space for personal dictionary\n");
@@ -700,7 +671,7 @@ CSpellTreeInsert(char *word, CDSpellDEnt *proto, int keep)
   if (word == NULL)
     word = proto->word;
 
-  hcode = CSpellHash(word, strlen (word), hsize);
+  hcode = CSpellHash(word, int(strlen(word)), hsize);
 
   php = NULL;
 
@@ -719,7 +690,7 @@ CSpellTreeInsert(char *word, CDSpellDEnt *proto, int keep)
       hp  = hp->next;
     }
 
-    hp = (CDSpellDEnt *) calloc(1, sizeof(CDSpellDEnt));
+    hp = reinterpret_cast<CDSpellDEnt *>(calloc(1, sizeof(CDSpellDEnt)));
 
     if (hp == NULL) {
       fprintf(stderr, "Ran out of space for personal dictionary\n");
@@ -741,7 +712,7 @@ CSpellTreeInsert(char *word, CDSpellDEnt *proto, int keep)
     if (php != NULL)
       php->next = hp;
 
-    hp->word = (char *) malloc(strlen(word) + 1);
+    hp->word = reinterpret_cast<char *>(malloc(strlen(word) + 1));
 
     if (hp->word == NULL) {
       fprintf(stderr, "Ran out of space for personal dictionary\n");
@@ -777,7 +748,7 @@ CSpellTreeInsert(char *word, CDSpellDEnt *proto, int keep)
     hp->k_followcase = 0;
 #endif
 
-    hp->keep = keep;
+    hp->keep = bool(keep);
 
     hcount++;
 
@@ -823,7 +794,7 @@ CSpellTreeLookup(char *word)
 
   strcpy(nword, word);
 
-  hcode = CSpellHash(nword, strlen(nword), hsize);
+  hcode = CSpellHash(nword, int(strlen(nword)), hsize);
 
   hp = &htab[hcode];
 
@@ -875,7 +846,7 @@ CSpellToUpper(char *s)
 
   while (*s) {
     if (islower(*s))
-      *s = toupper(*s);
+      *s = char(toupper(*s));
 
     s++;
   }
@@ -918,7 +889,7 @@ CSpellToLower(char *s)
 
   while (*s) {
     if (isupper(*s))
-      *s = tolower(*s);
+      *s = char(tolower(*s));
 
     s++;
   }
@@ -1066,12 +1037,12 @@ CSpellOutputTreeEntry(CDSpellDEnt *cent)
       CSpellToLower(wbuf);
 
       if (islower(wbuf[0]))
-        wbuf[0] = toupper(wbuf[0]);
+        wbuf[0] = char(toupper(wbuf[0]));
 
       CSpellOutputTreeWord(wbuf, cent);
     }
 
-    len = strlen(wbuf) + 1;
+    len = int(strlen(wbuf) + 1);
 
     cp = cent->word + len;
 
@@ -1089,7 +1060,7 @@ CSpellOutputTreeEntry(CDSpellDEnt *cent)
       CSpellToLower(wbuf);
 
     if (cent->k_capitalize && islower(wbuf[0]))
-      wbuf[0] = toupper(wbuf[0]);
+      wbuf[0] = char(toupper(wbuf[0]));
 
     CSpellOutputTreeWord(wbuf, cent);
   }

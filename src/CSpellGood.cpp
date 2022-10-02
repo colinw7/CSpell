@@ -60,7 +60,7 @@ CSpellIsGoodWord(char *w)
 
   for (p = w, q = nword; *p; p++, q++) {
     if (islower(*p))
-      *q = toupper(*p);
+      *q = char(toupper(*p));
     else
       *q = *p;
   }
@@ -75,7 +75,7 @@ CSpellIsGoodWord(char *w)
 
   /* Check Capitalized Word */
 
-  if (CSpellLookupWord(nword, q - nword, 1) != NULL) {
+  if (CSpellLookupWord(nword, int(q - nword), 1) != nullptr) {
 #ifdef CSPELL_CAPS
     return CSpellCapOK(w, cspell_last_dent);
 #else
@@ -85,7 +85,7 @@ CSpellIsGoodWord(char *w)
 
   /* Try Stripping off Suffixes */
 
-  n = strlen(w);
+  n = int(strlen(w));
 
   if (n == 1)
     return true;

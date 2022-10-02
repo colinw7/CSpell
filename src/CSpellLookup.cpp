@@ -51,7 +51,7 @@ CSpellInitWords()
     return -1;
   }
 
-  cspell_hashsize = read(hashfd, &cspell_hashheader, sizeof(cspell_hashheader));
+  cspell_hashsize = int(read(hashfd, &cspell_hashheader, sizeof(cspell_hashheader)));
 
   if (cspell_hashsize == 0) {
     /*
@@ -72,7 +72,7 @@ CSpellInitWords()
       return -1;
     }
 
-    cspell_hashtbl[0].word = (char *) "xxxxxxxxxxx";
+    cspell_hashtbl[0].word = const_cast<char *>("xxxxxxxxxxx");
     cspell_hashtbl[0].next = NULL;
     cspell_hashtbl[0].keep = 0;
     cspell_hashtbl[0].used = 1;
