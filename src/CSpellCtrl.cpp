@@ -149,31 +149,28 @@ CSpellCheckString(const char *str)
  *       int flag = CSpellCheckWord(const std::string &word);
  *
  * #INPUT_ARGS
- *       word    : The word to be checked.
+ *       word : The word to be checked.
  *
  * #OUTPUT_ARGS
  *       None
  *
  * #RETURN_ARG
- *       flag    : Flag to indicate whether the Word
- *               : was found in the Dictionary.
- *               :  0 - OK, 1 - Failed, -1 - Ignored.
+ *       flag : Flag to indicate whether the word was found in the dictionary.
+ *            :  0 - OK, 1 - Failed, -1 - Ignored.
  *
  * #NOTES
  *       Removes leading and Trailing Punctuation.
  *
  *       Ignores word under the following circumstances :-
- *
  *        . Word starts or ends with non-alphabetic
- *        . Word contains characters other than A-Z, a-z,
- *          ' (only one allowed) or '-'.
+ *        . Word contains characters other than A-Z, a-z, ' (only one allowed) or '-'.
  *
  *------------------------------------------------------------------*/
 
 extern int
 CSpellCheckWord(const std::string &word)
 {
-  return CSpellCheckWord(word.c_str(), int(word.size()), nullptr);
+  return CSpellCheckWord(word.c_str(), uint(word.size()), nullptr);
 }
 
 extern int
@@ -247,7 +244,7 @@ CSpellCheckWord(const char *word, uint length, char **word1)
 
   delete [] p1;
 
-  if (word1 != nullptr)
+  if (word1)
     *word1 = p;
   else
     delete [] word2;

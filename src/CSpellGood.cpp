@@ -8,21 +8,23 @@ static int wordok = false;
 /* Internal Subroutines */
 
 #ifdef CSPELL_CAPS
-static int  CSpellCapOK    (char *, CDSpellDEnt *);
+static int CSpellCapOK(char *, CDSpellDEnt *);
 #endif
+
 #if 0
 static void CSpellFlagPrint(char *, int, char *);
 #endif
-static void CSpellGEnding  (char *, int);
-static void CSpellDEnding  (char *, int);
-static void CSpellTEnding  (char *, int);
-static void CSpellREnding  (char *, int);
-static void CSpellHEnding  (char *, int);
-static void CSpellSEnding  (char *, int);
-static void CSpellNEnding  (char *, int);
-static void CSpellEEnding  (char *, int);
-static void CSpellYEnding  (char *, int);
-static int  CSpellIsVowel  (int);
+
+static void CSpellGEnding(char *, int);
+static void CSpellDEnding(char *, int);
+static void CSpellTEnding(char *, int);
+static void CSpellREnding(char *, int);
+static void CSpellHEnding(char *, int);
+static void CSpellSEnding(char *, int);
+static void CSpellNEnding(char *, int);
+static void CSpellEEnding(char *, int);
+static void CSpellYEnding(char *, int);
+static int  CSpellIsVowel(int);
 
 /*------------------------------------------------------------------*
  *
@@ -34,16 +36,13 @@ static int  CSpellIsVowel  (int);
  *
  *     word : The word to be checked.
  *
- *     flag : Flag to indicate whether the Word
- *          : was found in the Dictionary.
+ *     flag : Flag to indicate whether the word was found in the Dictionary.
  *          :  1 - OK, 0 - Failed.
  *
  * NOTES
- *   The routine CSpellCheckWord() should be used
- *   in preference to this routine (which is called
- *   by CSpellCheckWord()) so that all access to
- *   the Spell Checked from the rest of C (non
- *   cspell routines) is confined to routines in
+ *   The routine CSpellCheckWord() should be used in preference to this routine
+ *   (which is called by CSpellCheckWord()) so that all access to the Spell Checked
+ *   from the rest of C (non cspell routines) is confined to routines in
  *   the cspell.c file.
  *
  *------------------------------------------------------------------*/
@@ -51,13 +50,11 @@ static int  CSpellIsVowel  (int);
 extern int
 CSpellIsGoodWord(char *w)
 {
-  int   n;
   char *p;
   char *q;
   char  nword[100];
 
   /* Make an uppercase copy of the word we are checking.  */
-
   for (p = w, q = nword; *p; p++, q++) {
     if (islower(*p))
       *q = char(toupper(*p));
@@ -67,9 +64,10 @@ CSpellIsGoodWord(char *w)
 
   *q = '\0';
 
-  /* Initialise storage in which the root word (i.e. not
-     including the optional prefixes which may have caused
-     a match) is stored in. */
+  //---
+
+  /* Initialise storage in which the root word (i.e. not including the optional prefixes
+     which may have caused a match) is stored in. */
 
   cspell_rootword[0] = '\0';
 
@@ -85,7 +83,7 @@ CSpellIsGoodWord(char *w)
 
   /* Try Stripping off Suffixes */
 
-  n = int(strlen(w));
+  int n = int(strlen(w));
 
   if (n == 1)
     return true;
@@ -168,9 +166,7 @@ CSpellIsGoodWord(char *w)
 static int
 CSpellCapOK(char *word, CDSpellDEnt *dent)
 {
-  char *w;
   char *dword;
-  int   wcount;
 
   /* All caps is always legal. */
 
@@ -200,12 +196,14 @@ CSpellCapOK(char *word, CDSpellDEnt *dent)
 
     dword = dent->word + strlen (dent->word) + 1;
 
-    wcount = *dword++ & 0xFF;
+    int wcount = *dword++ & 0xFF;
 
     while (--wcount >= 0) {
       /* Skip over keep flag */
 
       dword++;
+
+      char *w;
 
       for (w = word; *w; w++, dword++) {
         if (*dword != *w) {
@@ -291,17 +289,13 @@ CSpellCapOK(char *word, CDSpellDEnt *dent)
 static void
 CSpellGEnding(char *w, int n)
 {
-  CDSpellDEnt *dent;
-
   /* if the word ends in 'ing', then *p == 'i' */
-
   char *p = w + n - 3;
 
-  if (strcmp (p, "ING") != 0)
+  if (strcmp(p, "ING") != 0)
     return;
 
   /* change I to E, like in CREATING */
-
   p[0] = 'E';
   p[1] = '\0';
 
@@ -310,9 +304,10 @@ CSpellGEnding(char *w, int n)
   if (n < 2)
     return;
 
+  CDSpellDEnt *dent;
+
   if ((dent = CSpellLookupWord(w, n, 1)) != NULL && dent->g_flag) {
     wordok = true;
-
     return;
   }
 
@@ -328,10 +323,8 @@ CSpellGEnding(char *w, int n)
   if (p[-1] == 'E')
     return;
 
-  if ((dent = CSpellLookupWord(w, n, 1)) != NULL) {
-    if (dent->g_flag)
-      wordok = true;
-
+  if ((dent = CSpellLookupWord(w, n, 1)) != NULL && dent->g_flag) {
+    wordok = true;
     return;
   }
 }
@@ -343,8 +336,8 @@ CSpellGEnding(char *w, int n)
  *
  *   CSpellDEnding(chat *word, int n);
  *
- *     word    : The word to be checked.
- *     n       : The length of the word to be checked.
+ *     word : The word to be checked.
+ *     n    : The length of the word to be checked.
  *
  * NOTES
  *   Global variable 'wordok' is updated if ending found.
@@ -354,10 +347,8 @@ CSpellGEnding(char *w, int n)
 static void
 CSpellDEnding(char *w, int n)
 {
-  char        *p;
-  CDSpellDEnt *dent;
-
-  p = w + n - 2;
+  /* if the word ends in 'ed', then *p == 'e' */
+  char *p = w + n - 2;
 
   if (strcmp(p, "ED") != 0)
     return;
@@ -368,13 +359,12 @@ CSpellDEnding(char *w, int n)
 
   n--;
 
-  if ((dent = CSpellLookupWord(w, n, 1)) != NULL) {
-    /* e.g. CREATED */
+  CDSpellDEnt *dent;
 
-    if (dent->d_flag) {
-      wordok = true;
-      return;
-    }
+  /* e.g. CREATED -> CREATE */
+  if ((dent = CSpellLookupWord(w, n, 1)) != NULL && dent->d_flag) {
+    wordok = true;
+    return;
   }
 
   if (n < 3)
@@ -398,12 +388,9 @@ CSpellDEnding(char *w, int n)
     p[0] = 'I';
   }
 
-  if ((p[0] != 'E' && p[0] != 'Y') ||
-      (p[0] == 'Y' && CSpellIsVowel(p[-1]))) {
-    if ((dent = CSpellLookupWord(w, n, 1)) != NULL) {
-      if (dent->d_flag)
-        wordok = true;
-
+  if ((p[0] != 'E' && p[0] != 'Y') || (p[0] == 'Y' && CSpellIsVowel(p[-1]))) {
+    if ((dent = CSpellLookupWord(w, n, 1)) != NULL && dent->d_flag) {
+      wordok = true;
       return;
     }
   }
@@ -427,10 +414,8 @@ CSpellDEnding(char *w, int n)
 static void
 CSpellTEnding(char *w, int n)
 {
-  char        *p;
-  CDSpellDEnt *dent;
-
-  p = w + n - 3;
+  /* if the word ends in 'est', then *p == 'e' */
+  char *p = w + n - 3;
 
   if (strcmp(p, "EST") != 0)
     return;
@@ -439,6 +424,8 @@ CSpellTEnding(char *w, int n)
 
   p[1] = '\0';
   n -= 2;
+
+  CDSpellDEnt *dent;
 
   if ((dent = CSpellLookupWord(w, n, 1)) != NULL && dent->t_flag) {
     wordok = true;
@@ -469,10 +456,8 @@ CSpellTEnding(char *w, int n)
 
   if ((p[0] != 'E' && p[0] != 'Y') ||
       (p[0] == 'Y' && CSpellIsVowel(p[-1]))) {
-    if ((dent = CSpellLookupWord(w, n, 1)) != NULL) {
-      if (dent->t_flag)
-        wordok = true;
-
+    if ((dent = CSpellLookupWord(w, n, 1)) != NULL && dent->t_flag) {
+      wordok = true;
       return;
     }
   }
@@ -485,8 +470,8 @@ CSpellTEnding(char *w, int n)
  *
  *   CSpellREnding(char *word, int n);
  *
- *     word    : The word to be checked.
- *     n       : The length of the word to be checked.
+ *     word : The word to be checked.
+ *     n    : The length of the word to be checked.
  *
  * NOTES
  *   Global variable 'wordok' is updated if ending found.
@@ -496,8 +481,7 @@ CSpellTEnding(char *w, int n)
 static void
 CSpellREnding(char *w, int n)
 {
-  CDSpellDEnt *dent;
-
+  /* if the word ends in 'er', then *p == 'e' */
   char *p = w + n - 2;
 
   if (strcmp(p, "ER") != 0)
@@ -507,6 +491,8 @@ CSpellREnding(char *w, int n)
 
   p[1] = '\0';
   n--;
+
+  CDSpellDEnt *dent;
 
   if ((dent = CSpellLookupWord(w, n, 1)) != NULL && dent->r_flag) {
     wordok = true;
@@ -564,8 +550,6 @@ CSpellREnding(char *w, int n)
 static void
 CSpellHEnding(char *w, int n)
 {
-  CDSpellDEnt *dent;
-
   char *p = w + n - 2;
 
   if (strcmp(p, "TH") != 0)
@@ -577,6 +561,8 @@ CSpellHEnding(char *w, int n)
 
   n -= 2;
   p -= 2;
+
+  CDSpellDEnt *dent;
 
   if (p[1] != 'Y') {
     if ((dent = CSpellLookupWord(w, n, 1)) != NULL && dent->h_flag)
@@ -593,9 +579,8 @@ CSpellHEnding(char *w, int n)
 
   n--;
 
-  if ((dent = CSpellLookupWord(w, n, 1)) != NULL)
-    if (dent->h_flag)
-      wordok = true;
+  if ((dent = CSpellLookupWord(w, n, 1)) != NULL && dent->h_flag)
+    wordok = true;
 }
 
 /*------------------------------------------------------------------*
@@ -618,8 +603,6 @@ CSpellHEnding(char *w, int n)
 static void
 CSpellSEnding(char *w, int n)
 {
-  CDSpellDEnt *dent;
-
   char *p = w + n;
 
   /* kill 'S' */
@@ -627,8 +610,9 @@ CSpellSEnding(char *w, int n)
   p[-1] = '\0';
   n--;
 
-  if (strchr("SXZHY", p[-2]) == NULL ||
-      (p[-2] == 'Y' && CSpellIsVowel(p[-3]))) {
+  CDSpellDEnt *dent;
+
+  if (strchr("SXZHY", p[-2]) == NULL || (p[-2] == 'Y' && CSpellIsVowel(p[-3]))) {
     if ((dent = CSpellLookupWord(w, n, 1)) != NULL && dent->s_flag) {
       wordok = true;
       return;
@@ -647,14 +631,13 @@ CSpellSEnding(char *w, int n)
 
         n -= 2;
 
-        if ((dent = CSpellLookupWord (w, n, 1)) != NULL &&
-            dent->x_flag) {
+        if ((dent = CSpellLookupWord(w, n, 1)) != NULL && dent->x_flag) {
           wordok = true;
           return;
         }
       }
 
-      if (strcmp (p - 8, "ICATE") == 0) {
+      if (strcmp(p - 8, "ICATE") == 0) {
         /* change "ICATE" to "Y" */
 
         p[-8] = 'Y';
@@ -662,22 +645,20 @@ CSpellSEnding(char *w, int n)
 
         n -= 4;
 
-        if ((dent = CSpellLookupWord(w, n, 1)) != NULL &&
-            dent->x_flag)
+        if ((dent = CSpellLookupWord(w, n, 1)) != NULL && dent->x_flag)
           wordok = true;
 
         return;
       }
 
-      if (strcmp (p - 3, "EN") == 0 && p[-4] != 'E' && p[-4] != 'Y') {
+      if (strcmp(p - 3, "EN") == 0 && p[-4] != 'E' && p[-4] != 'Y') {
         /* kill "EN" */
 
         p[-3] = '\0';
 
         n -= 2;
 
-        if ((dent = CSpellLookupWord(w, n, 1)) != NULL &&
-            dent->x_flag)
+        if ((dent = CSpellLookupWord(w, n, 1)) != NULL && dent->x_flag)
           wordok = true;
 
         return;
@@ -738,8 +719,7 @@ CSpellSEnding(char *w, int n)
 
         n--;
 
-        if ((dent = CSpellLookupWord(w, n, 1)) != NULL &&
-            dent->z_flag) {
+        if ((dent = CSpellLookupWord(w, n, 1)) != NULL && dent->z_flag) {
           wordok = true;
           return;
         }
@@ -749,15 +729,13 @@ CSpellSEnding(char *w, int n)
         p[-4] = 'I';
       }
 
-      if ((p[-4] != 'E' && p[-4] != 'Y') ||
-          (p[-4] == 'Y' && CSpellIsVowel(p[-5]))) {
+      if ((p[-4] != 'E' && p[-4] != 'Y') || (p[-4] == 'Y' && CSpellIsVowel(p[-5]))) {
         if (p[-3])
           n--;
 
         p[-3] = '\0';
 
-        if ((dent = CSpellLookupWord(w, n, 1)) != NULL &&
-            dent->z_flag)
+        if ((dent = CSpellLookupWord(w, n, 1)) != NULL && dent->z_flag)
           wordok = true;
       }
 
@@ -781,8 +759,7 @@ CSpellSEnding(char *w, int n)
       if (p[-3] == 'I' && ! CSpellIsVowel(p[-4])) {
         p[-3] = 'Y';
 
-        if ((dent = CSpellLookupWord(w, n, 1)) != NULL &&
-            dent->s_flag)
+        if ((dent = CSpellLookupWord(w, n, 1)) != NULL && dent->s_flag)
           wordok = true;
 
         return;
@@ -800,8 +777,7 @@ CSpellSEnding(char *w, int n)
       n -= 3;
 
       if (p[-5] != 'Y' || CSpellIsVowel(p[-6])) {
-        if ((dent = CSpellLookupWord(w, n, 1)) != NULL &&
-            dent->p_flag) {
+        if ((dent = CSpellLookupWord(w, n, 1)) != NULL && dent->p_flag) {
           wordok = true;
           return;
         }
@@ -810,8 +786,7 @@ CSpellSEnding(char *w, int n)
       if (p[-5] == 'I') {
         p[-5] = 'Y';
 
-        if ((dent = CSpellLookupWord(w, n, 1)) != NULL &&
-            dent->p_flag)
+        if ((dent = CSpellLookupWord(w, n, 1)) != NULL && dent->p_flag)
           wordok = true;
       }
 
@@ -849,7 +824,7 @@ CSpellSEnding(char *w, int n)
 static void
 CSpellNEnding(char *w, int n)
 {
-  CDSpellDEnt  *dent;
+  CDSpellDEnt *dent;
 
   char *p = w + n;
 
@@ -860,7 +835,6 @@ CSpellNEnding(char *w, int n)
     /* kill "EN" */
 
     p[-2] = '\0';
-
     n -= 2;
 
     if ((dent = CSpellLookupWord(w, n, 1)) != NULL && dent->n_flag)
@@ -879,15 +853,12 @@ CSpellNEnding(char *w, int n)
 
   n -= 2;
 
-  if ((dent = CSpellLookupWord(w, n, 1)) != NULL) {
-    if (dent->n_flag)
-      wordok = true;
-
+  if ((dent = CSpellLookupWord(w, n, 1)) != NULL && dent->n_flag) {
+    wordok = true;
     return;
   }
 
   /* check is really against "ICATION" */
-
   if (strcmp(p - 7, "ICATE") != 0)
     return;
 
@@ -920,30 +891,30 @@ CSpellNEnding(char *w, int n)
 static void
 CSpellEEnding(char *w, int n)
 {
-  CDSpellDEnt *dent;
-
+  // if the word ends in 'IVE', then *(p - 3) == 'I'
   char *p = w + n;
 
   if (strcmp(p - 3, "IVE") != 0)
     return;
 
-  /* change "IVE" to "E" */
-
+  // change "IVE" to "E"
   p[-3] = 'E';
   p[-2] = '\0';
-
   n -= 2;
+
+  // check word
+  CDSpellDEnt *dent;
 
   if ((dent = CSpellLookupWord(w, n, 1)) != NULL && dent->v_flag) {
     wordok = true;
     return;
   }
 
+  // ignore EIVE -> now EE
   if (p[-4] == 'E')
     return;
 
-  /* kill 'E' */
-
+  // kill 'E' (i.e. original word minus IVE)
   p[-3] = '\0';
   n--;
 
@@ -969,18 +940,18 @@ CSpellEEnding(char *w, int n)
 static void
 CSpellYEnding(char *w, int n)
 {
-  CDSpellDEnt *dent;
-
+  // if the word ends in 'ive', then *(p - 2) == 'l'
   char *p = w + n;
 
   if (strcmp(p - 2, "LY") != 0)
     return;
 
-  /* kill "LY" */
-
+  // kill "LY"
   p[-2] = '\0';
-
   n -= 2;
+
+  // check word
+  CDSpellDEnt *dent;
 
   if ((dent = CSpellLookupWord(w, n, 1)) != NULL && dent->y_flag)
     wordok = true;

@@ -12,6 +12,8 @@ main(int argc, char **argv)
 
     if (rc == 0)
       std::cerr << "Mispelled: " << argv[i] << std::endl;
+    else
+      std::cerr << "OK: " << argv[i] << std::endl;
   }
 
   CSpellTerm();
